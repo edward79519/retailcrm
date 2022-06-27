@@ -1,5 +1,3 @@
-import django.utils.timezone
-
 from django.db import models
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
@@ -113,9 +111,9 @@ class Company(models.Model):
     )
     pwr_usage = models.DecimalField(max_digits=11, decimal_places=1, blank=True, null=True)
     pwr_inquire = models.DecimalField(max_digits=11, decimal_places=1, blank=True, null=True)
-    unit_price = models.DecimalField(max_digits=5, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     duration = models.IntegerField(default=0)
-    warn_date = models.DateField()
+    warn_date = models.DateField(blank=True, null=True)
     remark = models.CharField(max_length=1000, blank=True, null=True)
     sponsor = models.ForeignKey(
         User,

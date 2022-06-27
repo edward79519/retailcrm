@@ -36,7 +36,7 @@ class CallRecord(models.Model):
     )
     summary = models.CharField(max_length=200)
     nextdate = models.DateField()
-    auther = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         related_name='callrecords',
@@ -44,6 +44,8 @@ class CallRecord(models.Model):
     add_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
+    is_draft = models.BooleanField(default=True)
+    is_open = models.BooleanField(default=True)
 
     def __str__(self):
         return "{}_{}".format(self.calldate, self.company)
@@ -61,3 +63,24 @@ class Participants(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Comment(models.Model):
+    record = models.ForeignKey(
+        CallRecord,
+        on_delete=models.PROTECT,
+        related_name='comments',
+    )
+    content = models.CharField(max_length=300)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='comments',
+    )
+    add_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return '{}-{}'.format(self.author.username, self.content)
+
