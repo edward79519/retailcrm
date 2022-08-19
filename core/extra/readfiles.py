@@ -1,10 +1,4 @@
-from pathlib import Path
-
-from openpyxl import load_workbook, Workbook
-from openpyxl.styles import Alignment, Protection
-from openpyxl.worksheet.datavalidation import DataValidation
-
-from retailCRM.settings import BASE_DIR
+from openpyxl import load_workbook
 
 
 def readxlsx(filepath):

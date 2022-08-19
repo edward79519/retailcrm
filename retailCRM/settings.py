@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,3 +134,58 @@ MEDIA_ROOT = BASE_DIR / 'retailCRM/media_files/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 登入認證資料庫順序 1.LDAP 2.內建資料庫
+AUTHENTICATION_BACKENDS = [
+    "django_auth_ldap.backend.LDAPBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# ldap的連線基礎配置
+AUTH_LDAP_SERVER_URI = "ldap://192.168.168.212:389"  # ldap or ad 伺服器地址
+AUTH_LDAP_BIND_DN = "CN=SupplyChainAdmin,OU=Service Administrators,DC=inaenergy,DC=com,DC=tw"  # 管理員的dn路徑
+AUTH_LDAP_BIND_PASSWORD = 'ina@50791838'  # 管理員密碼
+
+# 允許認證使用者的路徑
+AUTH_LDAP_USER_SEARCH = LDAPSearch("DC=inaenergy,DC=com,DC=tw",
+                                   ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)")
+
+# 通過組進行許可權控制
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("OU=Group,DC=inaenergy,DC=com,DC=tw",
+                                    ldap.SCOPE_SUBTREE, "(objectClass=top)")
+
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+
+
+# 如果ldap伺服器是Windows的AD，需要配置上如下選項
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_REFERRALS: 0,
+}
+
+# 當ldap使用者登入時，從ldap的使用者屬性對應寫到django的user資料庫，鍵為django的屬性，值為ldap使用者的屬性
+AUTH_LDAP_USER_ATTR_MAP = {
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+
+# 如果為True，每次組成員都從ldap重新獲取，保證組成員的實時性；反之會對組成員進行快取，提升效能，但是降低實時性
+AUTH_LDAP_FIND_GROUP_PERMS = True
+
+# This is the default, but I like to be explicit.
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+# AUTH_LDAP_CACHE_GROUPS = True
+# AUTH_LDAP_CACHE_TIMEOUT = 3600
+AUTH_LDAP_MIRROR_GROUPS = True
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+}
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
