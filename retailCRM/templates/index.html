@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+{% block title %}
+    寶晶能源售電業務客戶電訪記錄管理系統
+{% endblock %}
+{% load core_extra %}
+{% block content %}
+    <div class="container">
+        <div class="mt-5">
+            {% if request.user.is_authenticated %}
+            <h1>歡迎 {{ request.user }}</h1>
+            <h2 class="mt-5">新客戶</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>客戶名稱</th>
+                        <th>統一編號</th>
+                        <th>上市代碼</th>
+                        <th>產業別</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in new_comps %}
+                    <tr class="align-middle">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ company.shortname }}</td>
+                        <td>{{ company.sn }}</td>
+                        <td>{{ company.stock_id }}</td>
+                        <td>{{ company.category }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-primary" href="{% url 'Custtom_First' company.id %}">新增初次拜訪紀錄</a>
+                            <a class="btn btn-sm btn-primary" href="{% url 'Custom_Update' company.id %}">編輯</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">目前沒有新客戶，「<a href="{% url 'Custom_Add' %}">新增客戶</a>」。</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% for cmps in cmp_sets %}
+                {% if forloop.counter == 1 %}
+                <h2 class="mt-5">近期聯絡</h2>
+                {% elif forloop.counter == 2 %}
+                <h2 class="mt-5">一個月未聯絡</h2>
+                {% else %}
+                <h2 class="mt-5">許久未聯絡</h2>
+                {% endif %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>客戶簡稱</th>
+                            <th>客戶等級</th>
+                            <th>產業別</th>
+                            <th class="text-end">需求量(度/年)</th>
+                            <th class="text-end">報價(元/度)</th>
+                            <th class="text-end">合約(年)</th>
+                            <th>詢問狀態</th>
+                            <th>負責人</th>
+                            <th>最後連絡</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for company in cmps %}
+                        <tr>
+                            <td class="text-center"><strong>{{ forloop.counter }}</strong></td>
+                            <td><a href="{% url 'Custom_Detail' company.id %}">{{ company.shortname }}</a></td>
+                            <td>{{ company.rank }}</td>
+                            <td>{{ company.category }}</td>
+                            <td class="text-end">{{ company.pwr_inquire|floatformat:"1g" }}</td>
+                            <td class="text-end">{{ company.unit_price|floatformat:"2" }}</td>
+                            <td class="text-end">{{ company.duration }}</td>
+                            <td>{{ company.status }}</td>
+                            <td>{{ company.sponsor }}</td>
+                            <td>{{ company.news_record|datedelta }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+            {% else %}
+            <h1 class="text-center">歡迎來到</h1>
+            <h1 class="text-center">寶晶能源售電業務客戶電訪記錄管理系統</h1>
+            <p class="text-center lead">請點選右上角登入來進行更一步操作</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

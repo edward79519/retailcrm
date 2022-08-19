@@ -128,6 +128,7 @@ class Company(models.Model):
         related_name="compauth",
     )
     is_draft = models.BooleanField(default=True)
+    is_open = models.BooleanField(default=True)
     history = HistoricalRecords()
 
     def __str__(self):

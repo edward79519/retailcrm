@@ -1,0 +1,314 @@
+{% extends 'base/base.html' %}
+{% block title %}
+    編輯拜訪紀錄 - {{ record.calldate|date:'Y-m-d' }}
+{% endblock %}
+{% load core_extra %}
+{% block content %}
+    <div class="container">
+        <div class="row my-3 d">
+            <div class="col-12">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'Index' %}">首頁</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'Callrecord_Index' %}">拜訪紀錄</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'Callrecord_Detail' record.id %}">{{ record.calldate|date:'Y-m-d' }} - {{ record.company.shortname }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">編輯拜訪紀錄</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col-12">
+                <h1 class="my-3">編輯拜訪紀錄 - {{ record.calldate|date:'Y-m-d' }}-{{ record.company.shortname }}</h1>
+            </div>
+        </div>
+        <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="row gy-3">
+                <div class="col-3">
+                    <label for="copmany_name" class="form-label">客戶名稱:</label>
+                    <input id="copmany_name" type="text" class="form-control-plaintext" value="{{ record.company.sn }}-{{ record.company.shortname }}" disabled>
+                </div>
+                <div class="col-3">
+                    <label for="{{ form.calldate.auto_id }}" class="form-label">{{ form.calldate.label }}*:</label>
+                    {{ form.calldate }}
+                </div>
+                <div class="col-3">
+                    <label for="{{ form.calltype.auto_id }}" class="form-label">{{ form.calltype.label }}*:</label>
+                    {{ form.calltype }}
+                </div>
+                <div class="col-3">
+                    <label for="{{ pwrform.status.auto_id }}" class="form-label">客戶狀態:</label>
+                    {{ pwrform.status }}
+                </div>
+                <div class="col-3">
+                    <label for="{{ pwrform.pwr_usage.auto_id }}" class="form-label">年用電量:</label>
+                    <div class="input-group">
+                        {{ pwrform.pwr_usage }}
+                        <span class="input-group-text" id="basic-addon2">度/年</span>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label for="{{ pwrform.pwr_inquire.auto_id }}" class="form-label">年需求量:</label>
+                    <div class="input-group">
+                        {{ pwrform.pwr_inquire }}
+                        <span class="input-group-text" id="basic-addon2">度/年</span>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label for="{{ pwrform.unit_price.auto_id }}" class="form-label">單位報價:</label>
+                    <div class="input-group">
+                        {{ pwrform.unit_price }}
+                        <span class="input-group-text" id="basic-addon2">元/度</span>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label for="{{ pwrform.duration.auto_id }}" class="form-label">合約年限:</label>
+                    <div class="input-group">
+                        {{ pwrform.duration }}
+                        <span class="input-group-text" id="basic-addon2">年</span>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label for="{{ pwrform.warn_date.auto_id }}" class="form-label">重要日程:</label>
+                    {{ pwrform.warn_date}}
+                </div>
+                <div class="col-12">
+                    {{ pwrform.id }}
+                </div>
+                <div class="col-12">
+                    <div class="row gx-5">
+                        <div class="col-6">
+                            <h5><strong>我方參與人</strong></h5>
+                            <table class="table" id="ourform">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>姓名</th>
+                                        <th>職稱</th>
+                                        <th class="text-nowrap">刪除</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{ ourformset.management_form }}
+                                    {% for form in ourformset %}
+                                        <tr>
+                                            <td>{{ form.name }}</td>
+                                            <td>{{ form.title }}</td>
+                                            <td class="align-middle">
+                                                {{ form.side }}
+                                                {{ form.id }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3">
+                                            <button type="button" class="btn btn-sm btn-text" id="addour">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                </svg>
+                                                <span class="align-middle">新增</span>
+                                            </button>
+                                            <span class="text-danger align-middle mx-3" aria-label="message"></span>
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="col-6">
+                            <h5><strong>客戶參與人</strong></h5>
+                            <table class="table">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>姓名</th>
+                                        <th>職稱</th>
+                                        <th class="text-nowrap">刪除</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{ custformset.management_form }}
+                                    {% for form in custformset %}
+                                        <tr>
+                                            <td>{{ form.name }}</td>
+                                            <td>{{ form.title }}</td>
+                                            <td class="align-middle">
+                                                {{ form.side }}
+                                                {{ form.id }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3">
+                                            <button type="button" class="btn btn-sm btn-text" id="addcust">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                </svg>
+                                                <span class="align-middle">新增</span>
+                                            </button>
+                                            <span class="text-danger align-middle mx-3" aria-label="message"></span>
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.questions.auto_id }}" class="form-label">{{ form.questions.label }}:</label>
+                    {{ form.questions }}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.requirement.auto_id }}" class="form-label">{{ form.requirement.label }}:</label>
+                    {{ form.requirement }}
+                </div>
+                <div class="col-12">
+
+                    <label for="{{ form.attachment.auto_id }}" class="form-label">{{ form.attachment.label }}:</label>
+                    {% if record.attachment %}
+                    <div class="">
+                        原始檔案：{% if record.attachment %}<a href="{{ record.attachment.url }}">{{ record.attachment.file|filename }}</a>{% endif %}, 如更新請點擊下方框框重新上傳檔案。
+                    </div>
+                    {% endif %}
+                    {{ form.attachment }}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.summary.auto_id }}" class="form-label">{{ form.summary.label }}:</label>
+                    {{ form.summary }}
+                </div>
+                <div class="col-3">
+                    <label for="{{ form.nextdate.auto_id }}" class="form-label">{{ form.nextdate.label }}:</label>
+                    {{ form.nextdate }}
+                </div>
+                <div class="col-12">
+                    {{ form.author }}
+                </div>
+            </div>
+            <div class="col-12 my-3">
+                <button type="submit" class="btn btn-primary">送出</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block js_script %}
+    <script type="application/javascript">
+        $(document).ready(function() {
+            $('table.table').each(function(){
+                let data = $(this).find('tbody > tr');
+                let lastRow = data.last();
+                if (lastRow.find('td > input[name$="id"]').val() === "" && data.length > 1) {
+                    lastRow.remove();
+                    newRowCnt = $(this).find('tbody > tr').length;
+                    $(this).children('tbody').find('input[name$="TOTAL_FORMS"]').val(newRowCnt);
+                }
+            })
+            // load company power information
+            $(document).on('change', '#id_company', function () {
+                let id_comp = $('#id_company').val();
+                if (id_comp !== "") {
+                    $.ajax({
+                        url: '/core/ajax/getcompinfo/',
+                        method: "GET",
+                        data: {
+                            id_comp: id_comp,
+                        },
+                        success: function (res) {
+                            $('#id_status').val(res.status);
+                            $('#id_pwr_usage').val(res.pwr_usage);
+                            $('#id_pwr_inquire').val(res.pwr_inquire);
+                            $('#id_unit_price').val(res.unit_price);
+                            $('#id_duration').val(res.duration);
+                            $('#id_warn_date').val(res.warn_date);
+                        },
+                    });
+                }
+            });
+            // add new row function
+            $(document).on('click', '#addour, #addcust', function () {
+                let formtable = $(this).parents('table');
+                let rowdata = formtable.children('tbody').children('tr');
+                let rowcnt = rowdata.length
+                let maxrow = 5;
+                if (rowcnt < maxrow) {
+                    let newrow = rowdata.last().clone();
+                    let existChk = newrow.find('input[name$="id"]').val();
+                    if (existChk !== "") {
+                        newrow.find('input[name$="DELETE"]').addClass('d-none');
+                        newrow.find('td svg.bi-x').removeClass('d-none');
+                    }
+                    //console.log(newrow.html())
+                    newrow.find('input[type=text], input[name$="id"]').val("");
+                    newrow.find('input').each(function () {
+                        let new_id_value = $(this).attr('id').replace(rowcnt-1, rowcnt)
+                        let new_name_value = $(this).attr('name').replace(rowcnt-1, rowcnt)
+                        $(this).attr('id', new_id_value);
+                        $(this).attr('name', new_name_value);
+                        //console.log($(this).val())
+                    })
+                    //console.log(newrow.html())
+                    rowdata.last().after(newrow);
+                    formtable.children('tbody').find('input[name*=TOTAL_FORMS]').val(rowcnt+1);
+                    formtable.children('tfoot').find('span[aria-label=message]').text('');
+                } else {
+                    formtable.children('tfoot').find('span[aria-label=message]').text('不可新增超過5個人！');
+                }
+            });
+            // delete button
+            $('table').on('click', 'td svg.bi-x', function () {
+                let formtable = $(this).parents('table');
+                let rowdata = formtable.children('tbody').children('tr');
+                let rowcnt = rowdata.length;
+                let originDataId = $(this).parent('td').find('input[id$="id"]').val();
+                if (rowcnt > 1) {
+                        formtable.children('tfoot').find('span[aria-label=message]').text('');
+                        // remove this row
+                        if (originDataId !== "") {
+                            let dataName = $(this).parent().parent('tr').find('input[id$="name"]').val();
+                            let dataTitle = $(this).parent().parent('tr').find('input[id$="title"]').val();
+                            if (confirm("確定刪除" +dataName+"-"+dataTitle+"？\n\r（資料一旦刪除後即無法復原。）")) {
+                                $.ajax({
+                                    url: '/core/ajax/delparti/',
+                                    method: "GET",
+                                    data: {
+                                        id_parti: originDataId,
+                                    },
+                                    success: function (res) {
+                                       formtable.children('tfoot').find('span[aria-label=message]').text(res.msg);
+                                    },
+                                });
+                                $(this).closest('tr').remove();
+                            }
+                        } else {
+                            $(this).closest('tr').remove();
+                        }
+                        // get new row data
+                        let newrowdata = formtable.children('tbody').children('tr');
+                        // count row and set to TOTAL_FORM
+                        formtable.children('tbody').find('input[name*=TOTAL_FORMS]').val(newrowdata.length);
+                        // loop row to change input "id" and "name" value
+                        newrowdata.each(function (index) {
+                            // get this row original index
+                            let origin_idx = $(this).find('input').attr('id').split('-')[1];
+                            $(this).find('input').each(function () {
+                                // replace original index with new index
+                                let new_id_value = $(this).attr('id').replace(origin_idx, index);
+                                let new_name_value = $(this).attr('name').replace(origin_idx, index);
+                                $(this).attr('id', new_id_value);
+                                $(this).attr('name', new_name_value);
+                            });
+                        });
+                    } else {
+                        formtable.children('tfoot').find('span[aria-label=message]').text('最少要有1個人！');
+                    }
+            });
+        });
+    </script>
+{% endblock %}

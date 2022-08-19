@@ -3,9 +3,11 @@ from . import views
 
 
 urlpatterns = [
-    path('addcallrecord/', views.callrecord_add, name='Callrecord_Add'),
-    path('record/<record_id>/update/', views.callrecord_update, name='Callrecord_Update'),
-    path('firstcall/custom/<comp_id>/', views.firstcall, name='Firstcall'),
-    path('record/<record_id>/comment/add/', views.comment_add, name='Comment_Add'),
-    path('comment/<cmt_id>/', views.comment_update, name='Comment_Update'),
+    path('', views.callrecord_index, name='Callrecord_Index'),
+    path('record/add/', views.record_add, name='Callrecord_Add'),
+    path('record/<record_id>/', views.record_detail, name='Callrecord_Detail'),
+    path('record/<record_id>/lock/', views.record_lock, name='Callrecord_Lock'),
+    path('record/<record_id>/delete/', views.record_delete, name='Callrecord_Delete'),
+    path('record/<record_id>/update/', views.record_update, name='Callrecord_Update'),
+    path('comment/', views.comment_index, name='Comment_Index'),
 ]

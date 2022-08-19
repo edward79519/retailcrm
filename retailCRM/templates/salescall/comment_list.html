@@ -1,0 +1,198 @@
+{% extends 'base/base.html' %}
+{% block title %}
+    拜訪問題一覽
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row my-3">
+            <div class="col-12">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'Index' %}">首頁</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">拜訪問題一覽</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col-12">
+                <h1 class="my-3 col">拜訪問題一覽</h1>
+            </div>
+            <div class="col-12">
+                <div class="input-group my-3">
+                    <span class="input-group-text">快速搜尋</span>
+                    <input type="text" class="form-control" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
+                </div>
+            </div>
+            <div class="col-12">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>客戶名稱</th>
+                            <th>重要問題</th>
+                            <th>同仁回應</th>
+                            <th>動作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in records %}
+                        <tr>
+                            <td><a href="{% url 'Callrecord_Detail' record.id %}">{{ record.calldate|date:'Y-m-d'}}</a></td>
+                            <td>{{ record.company.shortname }}</td>
+                            <td>{{ record.questions }}</td>
+                            <td>
+                                <ul>
+                                    {% for comment in record.comments.all %}
+                                        <li>
+                                            <strong>{{ comment.author.username }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small>{{ comment.content }}
+                                            {% if comment.author.id == request.user.id %}
+                                            [<button type="button"
+                                                class="btn btn-link btn-sm p-0"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#updateModal"
+                                                data-bs-cmt="{{ comment.id }}"
+                                                data-bs-cnt="{{ comment.content }}">編輯
+                                            </button>/<button
+                                                type="button"
+                                                class="btn btn-link btn-sm p-0 text-danger"
+                                                id="cmt_del"
+                                                data-id="{{ comment.id }}">刪除</button>]
+                                            {% endif %}
+                                        </li>
+                                    {% empty %}
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                {% if request.user.is_authenticated %}
+                                <button type="button"
+                                        class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal"
+                                        data-bs-record="{{ record.id }}"
+                                        data-bs-title="{{ record.calldate|date:'Y-m-d' }}-{{ record.company.shortname }}">
+                                    新增回覆
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">新增回覆</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="id_content" class="col-form-label">回覆內容:</label>
+                                <textarea class="form-control" id="id_content" name="content" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <input type="hidden" class="form-control" id="id_record" name="record">
+                                <input type="hidden" name="author" value="{{ request.user.id }}">
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary" name="cmt_add">新增</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">編輯回覆</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="id_content" class="col-form-label">回覆內容:</label>
+                                <textarea class="form-control" id="id_content" name="content" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <input type="hidden" id="id_comment" name="comment">
+                                <input type="hidden" name="author" value="{{ request.user.id }}">
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary" name="cmt_update">儲存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js_script %}
+    <script>
+        var exampleModal = document.getElementById('exampleModal')
+        exampleModal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            var button = event.relatedTarget
+            // Extract info from data-bs-* attributes
+            var record_id = button.getAttribute('data-bs-record')
+            var record_name = button.getAttribute('data-bs-title')
+            // If necessary, you could initiate an AJAX request here
+            // and then do the updating in a callback.
+            //
+            // Update the modal's content.
+            var modalTitle = exampleModal.querySelector('.modal-title')
+            var modalBodyInput = exampleModal.querySelector('#id_record')
+
+            modalTitle.textContent = '新增回覆 ' + record_name
+            modalBodyInput.value = record_id
+        })
+        var updateModal = document.getElementById('updateModal')
+        updateModal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            var button = event.relatedTarget
+            // Extract info from data-bs-* attributes
+            var cmt_id = button.getAttribute('data-bs-cmt')
+            var cmt_cnt = button.getAttribute('data-bs-cnt')
+            // If necessary, you could initiate an AJAX request here
+            // and then do the updating in a callback.
+            //
+            // Update the modal's content.
+            var modalTitle = updateModal.querySelector('.modal-title')
+            var modalBodyInput = updateModal.querySelector('#id_content')
+            var modalHiddenInput = updateModal.querySelector('#id_comment')
+
+            modalTitle.textContent = '編輯回覆'
+            modalBodyInput.value = cmt_cnt
+            modalHiddenInput.value = cmt_id
+        })
+        $(document).ready(function () {
+            $(document).on('click', '#cmt_del', function () {
+                let cmt_id = $(this).attr('data-id');
+                if (confirm("確定刪除？\n\r（資料一旦刪除後即無法復原。）")) {
+                    $.ajax({
+                        url: '/core/ajax/delcomment/',
+                        method: "POST",
+                        data: {
+                            cmt_id: cmt_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function (res) {
+                            location.reload();
+                        },
+                    });
+                }
+            })
+        })
+    </script>
+{% endblock %}

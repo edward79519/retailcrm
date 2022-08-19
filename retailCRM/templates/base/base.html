@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>
+        {% block title %}{% endblock %}
+    </title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" />
+    <!-- CSS only -->
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    {% block custom_script %}{% endblock %}
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'Index' %}">寶晶能源 - 售電業務客戶電訪紀錄系統</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'Index' %}">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'Custom_Index' %}">客戶一覽</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'Callrecord_Index' %}">拜訪紀錄</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'Comment_Index' %}">問題一覽</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.is_authenticated %}
+                                {{ user.last_name }}{{ user.first_name }}
+                            {% else %}
+                                未登入
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            {% if user.is_superuser %}
+                            <li><a class="dropdown-item" href="/admin/">Admin Site</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="#">個人資料</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="#">登出</a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="#">登入</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    {%block content %}
+    {% endblock %}
+    <!-- Bootstrap core JS-->
+{#    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>#}
+    <script src="/static/bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="/static/jquery/jquery-3.6.0.min.js"></script>
+    <!-- Core theme JS-->
+    <script>
+        (() => {
+          'use strict'
+
+          // Fetch all the forms we want to apply custom Bootstrap validation styles to
+          const forms = document.querySelectorAll('.needs-validation')
+
+          // Loop over them and prevent submission
+          Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+              if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+              }
+
+              form.classList.add('was-validated')
+            }, false)
+          })
+        })()
+    </script>
+    {% block js_script %}{% endblock %}
+</body>
+</html>

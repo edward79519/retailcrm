@@ -1,0 +1,110 @@
+{% extends 'base/base.html' %}
+{% load core_extra %}
+{% block title %}
+    批次匯入客戶
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row my-3">
+            <div class="col-12 col-">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'Index' %}">首頁</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'Custom_Index' %}">客戶一覽</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">批次匯入客戶</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="row my-3 gy-3">
+            <div class="col-12">
+                <h1>批次匯入客戶</h1>
+            </div>
+            <div class="col-12">
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <label for="{{ form.source_file.auto_id }}" class="form-label">上傳檔案:</label>
+                    <div class="input-group mb-3">
+                        {{ form.source_file }}
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" name="fileupload">上傳</button>
+                          </div>
+                    </div>
+                    <div class="invalid-feedback">
+                        請選擇檔案。
+                    </div>
+                    <p class="form-text">{{ form.source_file.help_text|safe }}。<a href="/static/files/custom/import/customer_import_tmp.xlsx">下載匯入檔</a>。</p>
+
+                    {% if form.source_file.errors %}
+                        {% for error in form.source_file.errors %}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                          <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Danger:">
+                              <use xlink:href="#exclamation-triangle-fill"></use>
+                          </svg>
+                          <div>
+                              {{ error|escape }}
+                          </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        {% if formset %}
+        <div class="row my-3 gy-3">
+            <div class="col-12">
+                <h1>匯入結果</h1>
+            </div>
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                {{ formset.management_form }}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>公司名稱*</th>
+                            <th>公司簡稱*</th>
+                            <th>統一編號*</th>
+                            <th>上市代碼</th>
+                            <th class="text-nowrap">客戶來源</th>
+                            <th>負責人*</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in formset %}
+                        <tr>
+                            {% for field in f %}
+                            <td>
+                                <div class="">
+                                    <div>
+                                        {{ field }}
+                                    </div>
+                                    <div class="my-auto">
+                                    {% if field.help_text %}
+                                        <p class="form-text">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                    </div>
+                                    <div class="">
+                                    {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                          <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"></use></svg>
+                                          <div>
+                                              {{ error|escape }}
+                                          </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div>
+                                </div>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button class="btn btn-primary" type="submit" name="add_custom">送出</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

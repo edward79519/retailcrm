@@ -1,0 +1,267 @@
+{% extends 'base/base.html' %}
+{% load core_extra %}
+{% block title %}
+    拜訪紀錄資料
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row my-3">
+            <div class="col-12">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'Index' %}">首頁</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'Callrecord_Index' %}">拜訪紀錄</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ record.calldate|date:'Y-m-d' }} - {{ record.company.shortname }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12 text-">
+                <h1 class="mt-3">{{ record.calldate|date:'Y-m-d' }} - {{ record.company.shortname }} 拜訪詳細資訊</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 text-end">
+                <small class="">負責人：{{ record.author.username }}, 更新時間：{{ record.update_time|date:"Y-m-d H:i" }}, 新增時間：{{ record.add_time|date:"Y-m-d H:i" }}</small>
+            </div>
+            {% if record.author.id == request.user.id and record.is_draft %}
+            <div class="col-8 my-4">
+                <a class="btn btn-primary" href="{% url 'Callrecord_Update' record.id %}">編輯</a>
+                <button type="button"
+                        class="btn btn-success mx-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#lockModal">
+                    儲存鎖定
+                </button>
+            </div>
+            <div class="col-4 my-4 text-end">
+                <button type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                    刪除
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row my-3">
+            <div class="col-12">
+                <h2></h2>
+            </div>
+        </div>
+        <div class="row gy-4">
+            <div class="col-2 h4">
+                拜訪日期︰
+            </div>
+            <div class="col-10 h4">
+                <strong>{{ record.calldate|date:"Y-m-d" }}</strong>
+            </div>
+            <div class="col-2 h4">
+                公司名稱︰
+            </div>
+            <div class="col-10 h4">
+                <strong>{{ record.company.shortname }}</strong>
+            </div>
+            <div class="col-2 h4">
+                拜訪形式︰
+            </div>
+            <div class="col-10 h4">
+                <strong>{{ record.calltype.name }}</strong>
+            </div>
+        </div>
+        <div class="row my-3 gx-5">
+            <div class="col-4">
+                <h4>我方參與人</h4>
+                <table class="table table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">姓名</th>
+                            <th scope="col">職稱</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parti in our_partis %}
+                            <tr>
+                                <td>{{ parti.name }}</td>
+                                <td>{{ parti.title }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2">No People</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4">
+                <h4>客戶參與人</h4>
+                <table class="table table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">姓名</th>
+                            <th scope="col">職稱</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parti in cust_partis %}
+                            <tr>
+                                <td>{{ parti.name }}</td>
+                                <td>{{ parti.title }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2">No People</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row my-3 gy-3">
+            <div class="col-12">
+                <h4>需求詳述：</h4>
+                <p class="p-3">{{ record.requirement }}</p>
+            </div>
+            <div class="col-12">
+                <h4>重要問題：</h4>
+                <p class="p-3">{{ record.questions }}</p>
+            </div>
+            <div class="col-12" id="cmt_div">
+                <h4>同仁回應：</h4>
+                <ul id="comment_list">
+                    {% for comment in record.comments.all %}
+                        <li>
+                            <strong>{{ comment.author.username }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small><span class="cmt-cnt"> {{ comment.content }}</span>
+                            {% if comment.author.id == request.user.id %}
+                                [<span class="btn p-0 cmt-edit text-primary small" data-cmt-id="{{ comment.id }}">編輯</span>/<span class="btn p-0 cmt-del text-danger small" data-id="{{ comment.id }}">刪除</span>]
+                            {% endif %}
+                        </li>
+                    {%  empty %}
+                    {% endfor %}
+                </ul>
+                {% if request.user.is_authenticated %}
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="input-group my-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="cmt_id">
+                        <input type="text" class="form-control" placeholder="新增評論" name="cmt_cnt" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" id="button-addon">新增</button>
+                            <button class="btn btn-secondary" type="button" id="btn-cancel">取消</button>
+                        </div>
+                        <div class="invalid-feedback">
+                            請輸入回應內容。
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            <div class="col-12">
+                <h4>相關附件：</h4>
+                <p>
+                    {% if record.attachment %}
+                    <a href="{{ record.attachment.url }}">{{ record.attachment|filename }}</a>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-12">
+                <h4>訪問結果概要：{{ record.summary }}</h4>
+            </div>
+            <div class="col-12">
+                <h4>下次聯絡時間：{{ record.nextdate|date:"Y-m-d" }}</h4>
+            </div>
+        </div>
+    </div>
+    <!-- check box -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">確定刪除 {{ record.calldate|date:'Y-m-d' }} - {{ record.company.shortname }} ?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                            <div class="mb-3">
+                                <p>確定是否刪除</p>
+                                <p>拜訪客戶： <span class="text-primary"><strong>{{ record.company.fullname }}</strong></span></p>
+                                <p>拜訪日期： <span class="text-primary"><strong>{{ record.calldate|date:'Y-m-d' }}</strong></span></p>
+                                <p>的拜訪紀錄？</p>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <a class="btn btn-danger" href="{% url 'Callrecord_Delete' record.id %}">確定刪除</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="lockModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">鎖定 {{ record.calldate|date:'Y-m-d' }} - {{ record.company.shortname }} ?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                            <div class="mb-3">
+                                <p>確定是否鎖定</p>
+                                <p>拜訪客戶： <span class="text-primary"><strong>{{ record.company.fullname }}</strong></span></p>
+                                <p>拜訪日期： <span class="text-primary"><strong>{{ record.calldate|date:'Y-m-d' }}</strong></span></p>
+                                <p>的拜訪紀錄？</p>
+                                <p><strong>＊資料鎖定後即無法再次編輯。</strong></p>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <a class="btn btn-success" href="{% url 'Callrecord_Lock' record.id %}">確定儲存</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js_script %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#comment_list').on('click', 'span.cmt-edit', function () {
+                $(this).parents().parent().find('.bg-warning').removeClass('bg-warning');
+                $(this).parent().addClass('bg-warning');
+                $('input[name="cmt_id"]').val($(this).attr('data-cmt-id'));
+                $('input[name="cmt_cnt"]').val($(this).parent().children('span.cmt-cnt').text());
+                $('#button-addon').text('更新').removeClass('bg-primary').addClass('bg-success');
+            });
+            $(document).on('click', '#btn-cancel', function (){
+                $('input[name="cmt_id"]').val('');
+                $('input[name="cmt_cnt"]').val('');
+                $('#comment_list').children('li.bg-warning').removeClass('bg-warning');
+                $('#button-addon').text('新增').removeClass('bg-success').addClass('primary');
+            });
+            $(document).on('click', 'span.cmt-del', function () {
+                let cmt_id = $(this).attr('data-id');
+                $('input[name="cmt_id"]').val('');
+                $('input[name="cmt_cnt"]').val('');
+                $(this).parents().parent().find('.bg-warning').removeClass('bg-warning');
+                $(this).parent().addClass('bg-warning');
+                if (confirm("確定刪除？\n\r（資料一旦刪除後即無法復原。）")) {
+                    $.ajax({
+                        url: '/core/ajax/delcomment/',
+                        method: "POST",
+                        data: {
+                            cmt_id: cmt_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                        },
+                        success: function (res) {
+                            $("#cmt_div").load(" #cmt_div > *");
+                        },
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
