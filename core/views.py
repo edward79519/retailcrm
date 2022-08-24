@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
@@ -24,7 +25,7 @@ def custom_index(request):
 def custom_detail(request, comp_id):
     company = Company.objects.get(id=comp_id)
     template = loader.get_template('core/custom_detail.html')
-    records = company.callrecords.all().order_by('-calldate')
+    records = company.callrecords.filter(is_open=True, is_draft=False).order_by('-calldate')
     context = {
         'company': company,
         'records': records,
@@ -32,6 +33,7 @@ def custom_detail(request, comp_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def custom_add(request):
     template = loader.get_template('core/custom_add.html')
     if request.method == 'POST':
@@ -47,6 +49,7 @@ def custom_add(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def custom_update(request, comp_id):
     company = Company.objects.get(id=comp_id)
     template = loader.get_template('core/custom_update.html')
@@ -64,6 +67,7 @@ def custom_update(request, comp_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def custom_delete(request, comp_id):
     company = Company.objects.get(id=comp_id)
     if company.author.id == request.user.id:
@@ -72,6 +76,7 @@ def custom_delete(request, comp_id):
     return HttpResponseRedirect('/core/custom/')
 
 
+@login_required
 def custom_import(request):
     formset = None
     template = loader.get_template('core/custom_import.html')
@@ -142,4 +147,3 @@ def custom_import(request):
 
     }
     return HttpResponse(template.render(context, request))
-

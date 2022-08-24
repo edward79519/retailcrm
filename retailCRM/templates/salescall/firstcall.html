@@ -3,6 +3,10 @@
     新增初次拜訪紀錄
 {% endblock %}
 {% load core_extra %}
+{% block custom_script %}
+    <link href="/static/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/static/select2/css/select2-bootstrap4.min.css" rel="stylesheet" />
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row my-3 d">
@@ -234,31 +238,13 @@
     </div>
 {% endblock %}
 {% block js_script %}
+    <script src="/static/select2/js/select2.full.min.js"></script>
     <script type="application/javascript">
         $(document).ready(function() {
-            // load company power information
-            /*
-            $(document).on('change', '#id_company', function () {
-                let id_comp = $('#id_company').val();
-                if (id_comp !== "") {
-                    $.ajax({
-                        url: '/core/ajax/getcompinfo/',
-                        method: "GET",
-                        data: {
-                            id_comp: id_comp,
-                        },
-                        success: function (res) {
-                            $('#id_status').val(res.status);
-                            $('#id_pwr_usage').val(res.pwr_usage);
-                            $('#id_pwr_inquire').val(res.pwr_inquire);
-                            $('#id_unit_price').val(res.unit_price);
-                            $('#id_duration').val(res.duration);
-                            $('#id_warn_date').val(res.warn_date);
-                        },
-                    });
-                }
+            // Select2 function
+            $('select.form-control').select2({
+                theme: 'bootstrap4',
             });
-             */
             // add new row function
             $(document).on('click', '#addour, #addcust', function () {
                 let formtable = $(this).parents('table');

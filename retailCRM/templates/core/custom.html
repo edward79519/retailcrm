@@ -3,6 +3,9 @@
 {% block title %}
     客戶一覽
 {% endblock %}
+{% block custom_script %}
+    <link href="/static/custom/css/page.css" rel="stylesheet">
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row my-3">
@@ -25,48 +28,78 @@
                 <a class="btn btn-primary" href="{% url 'Custom_import' %}">匯入客戶</a>
             </div>
             {% endif %}
-            <div class="col-12">
-                <div class="input-group my-3">
-                    <span class="input-group-text">快速搜尋</span>
-                    <input type="text" class="form-control" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
-                </div>
-            </div>
+
         </div>
         <div class="row">
             <div class="col-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>客戶簡稱</th>
-                            <th>客戶等級</th>
-                            <th>產業別</th>
-                            <th class="text-end">需求量(度/年)</th>
-                            <th class="text-end">報價(元/度)</th>
-                            <th class="text-end">合約(年)</th>
-                            <th>詢問狀態</th>
-                            <th>負責人</th>
-                            <th>最後連絡</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for company in companies %}
-                        <tr>
-                            <td class="text-center"><strong>{{ forloop.counter }}</strong></td>
-                            <td><a href="{% url 'Custom_Detail' company.id %}">{{ company.shortname }}</a></td>
-                            <td>{{ company.rank }}</td>
-                            <td>{{ company.category }}</td>
-                            <td class="text-end">{{ company.pwr_inquire }}</td>
-                            <td class="text-end">{{ company.unit_price }}</td>
-                            <td class="text-end">{{ company.duration }}</td>
-                            <td>{{ company.status }}</td>
-                            <td>{{ company.sponsor }}</td>
-                            <td>{{ company.callrecords.last.calldate|datedelta }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div id="custom-list">
+                    <div class="row mb-3">
+                        <div class="col-8">
+                            <div class="input-group">
+                                <span class="input-group-text">快速搜尋</span>
+                                <input type="search" class="form-control search" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-end mb-0"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <table class="table table-hover" >
+                        <thead >
+                            <tr class="border-1">
+                                <th scope="col" class="text-center sort" data-sort="idx">#</th>
+                                <th scope="col" class="sort" data-sort="shortname">客戶簡稱</th>
+                                <th scope="col" class="text-center sort" data-sort="rank">客戶等級</th>
+                                <th scope="col" class="sort" data-sort="category">產業別</th>
+                                <th scope="col" class="text-end sort" data-sort="inquire">需求量(度/年)</th>
+                                <th scope="col" class="text-end sort" data-sort="price">報價(元/度)</th>
+                                <th scope="col" class="text-end sort" data-sort="duration">合約(年)</th>
+                                <th scope="col" class="text-center sort" data-sort="status">詢問狀態</th>
+                                <th scope="col" class="sort" data-sort="sponsor">負責人</th>
+                                <th scope="col" class="text-end">最後連絡</th>
+                            </tr>
+                        </thead>
+                        <tbody class="list">
+                        {% for company in companies %}
+                            <tr>
+                                <td class="idx text-center"><strong>{{ forloop.counter }}</strong></td>
+                                <td><a href="{% url 'Custom_Detail' company.id %}" class="shortname">{{ company.shortname }}</a></td>
+                                <td class="text-center rank">{{ company.rank|default_if_none:"" }}</td>
+                                <td class="category">{{ company.category|default_if_none:""  }}</td>
+                                <td class="text-end inquire">{{ company.pwr_inquire|default_if_none:""  }}</td>
+                                <td class="text-end price">{{ company.unit_price|default_if_none:""  }}</td>
+                                <td class="text-end duration">{{ company.duration|default_if_none:""  }}</td>
+                                <td class="text-center status">{{ company.status|default_if_none:""  }}</td>
+                                <td class="sponsor">{{ company.sponsor|id_fullname  }}</td>
+                                <td class="text-end">{{ company.callrecords.last.calldate|datedelta }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+{% block js_script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <script>
+      var options = {
+        valueNames: ['idx', 'shortname', 'rank', 'category', 'inquire', 'price', 'duration', 'status', 'sponsor'],
+        page: 20,
+        pagination: [{
+            name: "pagination",
+            paginationClass: "pagination",
+            innerWindow: 1,
+            outerWindow: 1,
+            item: "<li class='page-item'><a class='page-link page' href='javascript:function Z(){Z=\"\"}Z()'></a></li>",
+        }],
+      };
+
+      /*table = id of the div */
+      var customList = new List('custom-list', options);
+    </script>
 {% endblock %}

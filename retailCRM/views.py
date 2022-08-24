@@ -23,7 +23,7 @@ def index(request):
             news_record__gte=timezone.now().date() - timedelta(weeks=4),
             news_record__lt=timezone.now().date() - timedelta(weeks=2),
         )
-        cmp_other = comp_w_rcrddt.filter(news_record__lt=timezone.now().date() - timedelta(weeks=4))[:5]
+        cmp_other = comp_w_rcrddt.filter(news_record__lt=timezone.now().date() - timedelta(weeks=4))
         cmp_sets = [cmp_twowk, cmp_onemon, cmp_other]
         context = {
             'new_comps': new_comps,

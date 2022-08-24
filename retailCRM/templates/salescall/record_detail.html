@@ -132,7 +132,7 @@
                 <ul id="comment_list">
                     {% for comment in record.comments.all %}
                         <li>
-                            <strong>{{ comment.author.username }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small><span class="cmt-cnt"> {{ comment.content }}</span>
+                            <strong>{{ comment.author|id_fullname }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small><span class="cmt-cnt"> {{ comment.content }}</span>
                             {% if comment.author.id == request.user.id %}
                                 [<span class="btn p-0 cmt-edit text-primary small" data-cmt-id="{{ comment.id }}">編輯</span>/<span class="btn p-0 cmt-del text-danger small" data-id="{{ comment.id }}">刪除</span>]
                             {% endif %}

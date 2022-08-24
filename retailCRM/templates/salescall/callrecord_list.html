@@ -3,6 +3,9 @@
 {% block title %}
     拜訪紀錄
 {% endblock %}
+{% block custom_script %}
+    <link href="/static/custom/css/page.css" rel="stylesheet">
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row my-3">
@@ -30,82 +33,132 @@
             <div class="col-12 mt-3">
                 <h2>草稿</h2>
             </div>
-            <div class="col-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>日期</th>
-                            <th>客戶名稱</th>
-                            <th>客戶等級</th>
-                            <th>客戶參與人</th>
-                            <th>接洽形式</th>
-                            <th>拜訪結果概要</th>
-                            <th>下次拜訪時間</th>
-                            <th>負責人</th>
-                            <th>動作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for record in records_draft %}
-                        <tr>
-                            <td class="text-center"><strong>{{ forloop.counter }}</strong></td>
-                            <td><a href="{% url 'Callrecord_Detail' record.id %}">{{ record.calldate|date:'Y-m-d'}}</a></td>
-                            <td>{{ record.company.shortname }}</td>
-                            <td>{{ record.company.rank }}</td>
-                            <td>{{ record|firstparti }}</td>
-                            <td>{{ record.calltype }}</td>
-                            <td>{{ record.summary }}</td>
-                            <td>{{ record.nextdate|date:'Y-m-d' }}</td>
-                            <td>{{ record.author.username }}</td>
-                            <td><a href="{% url 'Callrecord_Update' record.id %}" class="btn btn-sm btn-primary">編輯</a></td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+            <div class="col-12" id="draft-list">
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end mb-0"></ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center sort" data-sort="idx">#</th>
+                                    <th scope="col" class="sort" data-sort="date">日期</th>
+                                    <th scope="col" class="sort" data-sort="shortname">客戶名稱</th>
+                                    <th scope="col" class="text-center sort" data-sort="rank">客戶等級</th>
+                                    <th scope="col" class="sort" data-sort="parti">客戶參與人</th>
+                                    <th scope="col" class="sort" data-sort="type">接洽形式</th>
+                                    <th scope="col">拜訪結果概要</th>
+                                    <th scope="col" class="text-center sort" data-sort="next-date">下次拜訪時間</th>
+                                    <th scope="col">負責人</th>
+                                    <th scope="col" class="text-center">動作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="list">
+                            {% for record in records_draft %}
+                                <tr>
+                                    <td class="text-center idx"><strong>{{ forloop.counter }}</strong></td>
+                                    <td><a href="{% url 'Callrecord_Detail' record.id %}" class="date">{{ record.calldate|date:'Y-m-d'}}</a></td>
+                                    <td class="shortname">{{ record.company.shortname }}</td>
+                                    <td class="text-center rank">{{ record.company.rank|default_if_none:"" }}</td>
+                                    <td class="parti">{{ record|firstparti }}</td>
+                                    <td class="type">{{ record.calltype }}</td>
+                                    <td>{{ record.summary }}</td>
+                                    <td class="text-center next-date">{{ record.nextdate|date:'Y-m-d' }}</td>
+                                    <td>{{ record.author|id_fullname }}</td>
+                                    <td class="text-center"><a href="{% url 'Callrecord_Update' record.id %}" class="btn btn-sm btn-primary">編輯</a></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">目前尚無任何草稿。</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             {% endif %}
             <div class="col-12 mt-3">
                 <h2>拜訪紀錄一覽</h2>
             </div>
-            <div class="col-12">
-                <div class="input-group my-3">
-                    <span class="input-group-text">快速搜尋</span>
-                    <input type="text" class="form-control" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
+            <div id="history" class="col-12">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="input-group">
+                            <span class="input-group-text">快速搜尋</span>
+                            <input type="text" class="form-control search" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end mb-0"></ul>
+                        </nav>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>日期</th>
-                            <th>客戶名稱</th>
-                            <th>客戶等級</th>
-                            <th>客戶參與人</th>
-                            <th>接洽形式</th>
-                            <th>拜訪結果概要</th>
-                            <th>下次拜訪時間</th>
-                            <th>負責人</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for record in records_cmplt %}
-                        <tr>
-                            <td class="text-center"><strong>{{ forloop.counter }}</strong></td>
-                            <td><a href="{% url 'Callrecord_Detail' record.id %}">{{ record.calldate|date:'Y-m-d'}}</a></td>
-                            <td>{{ record.company.shortname }}</td>
-                            <td>{{ record.company.rank }}</td>
-                            <td>{{ record|firstparti }}</td>
-                            <td>{{ record.calltype }}</td>
-                            <td>{{ record.summary }}</td>
-                            <td>{{ record.nextdate|date:'Y-m-d' }}</td>
-                            <td>{{ record.author.username }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center sort" data-sort="idx">#</th>
+                                    <th scope="col" class="sort" data-sort="date">日期</th>
+                                    <th scope="col" class="sort" data-sort="shortname">客戶名稱</th>
+                                    <th scope="col" class="text-center sort" data-sort="rank">客戶等級</th>
+                                    <th scope="col" class="sort" data-sort="parti">客戶參與人</th>
+                                    <th scope="col" class="sort" data-sort="type">接洽形式</th>
+                                    <th scope="col">拜訪結果概要</th>
+                                    <th scope="col" class="text-center sort" data-sort="next-date">下次拜訪時間</th>
+                                    <th scope="col" class="sort" data-sort="sponsor">負責人</th>
+                                </tr>
+                            </thead>
+                            <tbody class="list">
+                            {% for record in records_cmplt %}
+                                <tr>
+                                    <td class="text-center idx"><strong>{{ forloop.counter }}</strong></td>
+                                    <td><a href="{% url 'Callrecord_Detail' record.id %}" class="date">{{ record.calldate|date:'Y-m-d'}}</a></td>
+                                    <td class="shortname">{{ record.company.shortname }}</td>
+                                    <td class="text-center rank">{{ record.company.rank|default_if_none:"" }}</td>
+                                    <td class="parti">{{ record|firstparti }}</td>
+                                    <td class="type">{{ record.calltype }}</td>
+                                    <td>{{ record.summary }}</td>
+                                    <td class="text-center next-date">{{ record.nextdate|date:'Y-m-d' }}</td>
+                                    <td class="sponsor">{{ record.author|id_fullname }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js_script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <script>
+        var options = {
+            valueNames: ['idx', 'date', 'shortname', 'rank', 'parti', 'type', 'next-date'],
+            page: 10,
+            pagination: [{
+                name: "pagination",
+                paginationClass: "pagination",
+                innerWindow: 1,
+                outerWindow: 1,
+                item: "<li class='page-item'><a class='page-link page' href='javascript:function Z(){Z=\"\"}Z()'></a></li>",
+            }],
+        };
+        let history_ops = options
+        history_ops.valueNames.push('sponsor')
+        /*table = id of the div */
+        var draftList = new List('draft-list', options);
+        var historyList = new List('history', history_ops);
+        {#var historyList = new List('history-list', options);#}
+    </script>
 {% endblock %}

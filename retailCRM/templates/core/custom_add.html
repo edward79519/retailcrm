@@ -1,5 +1,9 @@
 {% extends 'base/base.html' %}
 {% block title %}新增客戶{% endblock %}
+{% block custom_script %}
+    <link href="/static/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/static/select2/css/select2-bootstrap4.min.css" rel="stylesheet" />
+{% endblock %}
 {% block content %}
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
@@ -25,34 +29,40 @@
         </div>
         <form method="POST" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="row">
+            <div class="row gy-5">
             {% for field in form %}
-                <div class="col-6 my-3">
-                    <div class="form-floating">
-                        {{ field }}{{ field.label_tag }}
-                        <div class="invalid-feedback">
-                            請輸入必要欄位。
-                        </div>
-                        {% if field.help_text %}
-                            <p class="form-text">{{ field.help_text|safe }}</p>
-                        {% endif %}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                            <div class="alert alert-danger d-flex align-items-center" role="alert">
-                              <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-                              <div>
-                                  {{ error|escape }}
-                              </div>
-                            </div>
-                            {% endfor %}
-                        {% endif %}
+                <div class="col-6">
+                    {{ field.label_tag }}{{ field }}
+                    <div class="invalid-feedback">
+                        請輸入必要欄位。
                     </div>
+                    {% if field.help_text %}
+                        <p class="form-text">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                          <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                          <div>
+                              {{ error|escape }}
+                          </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-
             {% endfor %}
             </div>
-
-            <button class="btn btn-primary" type="submit">送出</button>
+            <button class="btn btn-primary mt-0" type="submit">送出</button>
         </form>
     </div>
+{% endblock %}
+{% block  js_script %}
+    <script src="/static/select2/js/select2.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('select.form-control').select2({
+                theme: 'bootstrap4',
+            });
+        });
+    </script>
 {% endblock %}

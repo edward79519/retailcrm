@@ -3,6 +3,10 @@
     編輯拜訪紀錄 - {{ record.calldate|date:'Y-m-d' }}
 {% endblock %}
 {% load core_extra %}
+{% block custom_script %}
+    <link href="/static/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/static/select2/css/select2-bootstrap4.min.css" rel="stylesheet" />
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row my-3 d">
@@ -199,8 +203,13 @@
     </div>
 {% endblock %}
 {% block js_script %}
+    <script src="/static/select2/js/select2.full.min.js"></script>
     <script type="application/javascript">
         $(document).ready(function() {
+            // Select2 Function
+            $('select.form-control').select2({
+                theme: 'bootstrap4',
+            });
             $('table.table').each(function(){
                 let data = $(this).find('tbody > tr');
                 let lastRow = data.last();

@@ -12,9 +12,9 @@
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" />
+{#    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" />#}
     <!-- CSS only -->
-    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     {% block custom_script %}{% endblock %}
 </head>
 <body>
@@ -41,7 +41,7 @@
                             {% if user.is_superuser %}
                             <li><a class="dropdown-item" href="/admin/">Admin Site</a></li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="#">個人資料</a></li>
+{#                            <li><a class="dropdown-item" href="#">個人資料</a></li>#}
                             <li><hr class="dropdown-divider" /></li>
                             {% if user.is_authenticated %}
                             <li><a class="dropdown-item" href="{% url 'logout' %}">登出</a></li>

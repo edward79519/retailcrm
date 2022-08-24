@@ -2,6 +2,10 @@
 {% block title %}
     新增拜訪紀錄
 {% endblock %}
+{% block custom_script %}
+    <link href="/static/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/static/select2/css/select2-bootstrap4.min.css" rel="stylesheet" />
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row my-3 d">
@@ -189,8 +193,13 @@
     </div>
 {% endblock %}
 {% block js_script %}
+    <script src="/static/select2/js/select2.full.min.js"></script>
     <script type="application/javascript">
         $(document).ready(function() {
+            // Select2 function
+            $('select.form-control').select2({
+                theme: 'bootstrap4',
+            });
             // load company power information
             $(document).on('change', '#id_company', function () {
                 let id_comp = $('#id_company').val();

@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% block title %}客戶資料 - {{ company.fullname }}{% endblock %}
 {% load core_extra %}
+
 {% block content %}
     <div class="container">
         <div class="row my-3">
@@ -21,7 +22,7 @@
         </div>
         <div class="row">
             <div class="col-sm-6">
-                <small>負責人：{{ company.sponsor.username }}, 客戶狀態：{{ company.status }}, 上次拜訪時間：{{ company.callrecords.last.calldate|datedelta }}</small>
+                <small>負責人：{{ company.sponsor.username }}, 客戶狀態：{{ company.status|default_if_none:'無' }}, 上次拜訪時間：{{ company.callrecords.last.calldate|datedelta }}</small>
             </div>
             <div class="col-sm-6 text-end">
                 <small class="">更新時間：{{ company.update_time|date:"Y-m-d H:i" }}, 新增時間：{{ company.add_time|date:"Y-m-d H:i" }}</small>
@@ -72,31 +73,31 @@
                 上市代碼︰
             </div>
             <div class="col-2">
-                <strong>{{ company.stock_id }}</strong>
+                <strong>{{ company.stock_id|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 產業別︰
             </div>
             <div class="col-2">
-                <strong>{{ company.category }}</strong>
+                <strong>{{ company.category|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 客戶等級︰
             </div>
             <div class="col-2">
-                <strong>{{ company.rank }}</strong>
+                <strong>{{ company.rank|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 客戶來源︰
             </div>
             <div class="col-6">
-                <strong>{{ company.source }}</strong>
+                <strong>{{ company.source|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 公司地址︰
             </div>
             <div class="col-10">
-                <strong>{{ company.addr_county.name  }}{{ company.addr_detail }}</strong>
+                <strong>{{ company.addr_county.name|default_if_none:''  }}{{ company.addr_detail|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 公司網站：
@@ -108,25 +109,25 @@
                 主要聯絡人：
             </div>
             <div class="col-2">
-                <strong>{{ company.contact_name }}</strong>
+                <strong>{{ company.contact_name|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 職稱：
             </div>
             <div class="col-2">
-                <strong>{{ company.contact_title }}</strong>
+                <strong>{{ company.contact_title|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 聯絡電話：
             </div>
             <div class="col-2">
-                <strong>{{ company.contact_tel }}</strong>
+                <strong>{{ company.contact_tel|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 聯絡信箱：
             </div>
             <div class="col-10">
-                <strong>{{ company.contact_email }}</strong>
+                <strong>{{ company.contact_email|default_if_none:'' }}</strong>
             </div>
             <div class="col-2">
                 CSR/ESG 報告：
@@ -140,7 +141,7 @@
                 備註：
             </div>
             <div class="col-10">
-                <strong>{{ company.remark }}</strong>
+                <strong>{{ company.remark|default_if_none:'' }}</strong>
             </div>
         </div>
         <div class="row mt-3 ">
@@ -155,7 +156,7 @@
                         年用電量：
                     </div>
                     <div class="col-6">
-                        <strong>{{ company.pwr_usage }} 度／年</strong>
+                        <strong>{{ company.pwr_usage|default_if_none:'-' }} 度／年</strong>
                     </div>
                 </div>
             </div>
@@ -165,7 +166,7 @@
                         需求量：
                     </div>
                     <div class="col-6">
-                        <strong>{{ company.pwr_inquire }} 度／年</strong>
+                        <strong>{{ company.pwr_inquire|default_if_none:'-' }} 度／年</strong>
                     </div>
                 </div>
             </div>
@@ -175,7 +176,7 @@
                         報價：
                     </div>
                     <div class="col-6">
-                        <strong>{{ company.unit_price }} 元／度</strong>
+                        <strong>{{ company.unit_price|default_if_none:'-' }} 元／度</strong>
                     </div>
                 </div>
             </div>
@@ -200,15 +201,29 @@
                 </div>
             </div>
         </div>
-        <div class="row my-3 ">
+        <div class="row my-3" id="records">
             <div class="col-12">
                 <h2>拜訪紀錄</h2>
+            </div>
+            <div class="col-8">
+                {% if user.is_authenticated and user.id == company.sponsor.id %}
+                    {% if company.is_draft %}
+                    <a class="btn btn-primary" href="{% url 'Custtom_First' company.id %}">新增初次拜訪紀錄</a>
+                    {% else %}
+                    <a class="btn btn-primary" href="{% url 'Callrecord_Add' %}?id_comp={{ company.id }}">新增拜訪紀錄</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0"></ul>
+                </nav>
             </div>
             <div class="col-12">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th></th>
+                            <th class="text-center">#</th>
                             <th>日期</th>
                             <th>接洽形式</th>
                             <th>拜訪結果概要</th>
@@ -216,12 +231,8 @@
                             <th>負責人</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    {% if company.is_draft %}
-                    <a class="btn btn-primary" href="{% url 'Custtom_First' company.id %}">新增初次拜訪紀錄</a>
-                    {% else %}
-                    <a class="btn btn-primary" href="{% url 'Callrecord_Add' %}?id_comp={{ company.id }}">新增拜訪紀錄</a>
-                    {% endif %}
+                    <tbody class="list">
+
                     {% for record in records%}
                         <tr>
                             <td class="text-center"><strong>{{ forloop.counter }}</strong></td>
@@ -229,11 +240,16 @@
                             <td>{{ record.calltype }}</td>
                             <td>{{ record.summary }}</td>
                             <td>{{ record.nextdate|date:'Y-m-d' }}</td>
-                            <td>{{ record.author.username }}</td>
+                            <td>{{ record.author|id_fullname }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center">目前沒有拜訪資料，新增「<a href="{% url 'Custtom_First' company.id %}">初次拜訪紀錄</a>」。</td>
+                            <td colspan="6" class="text-center">
+                                目前沒有拜訪資料
+                                {% if user.is_authenticated and user.id == company.sponsor.id %}
+                                    ，新增「<a href="{% url 'Custtom_First' company.id %}">初次拜訪紀錄</a>」
+                                {% endif %}。
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -266,4 +282,22 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block js_script %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <script>
+      var options = {
+        page: 20,
+        pagination: [{
+            name: "pagination",
+            paginationClass: "pagination",
+            innerWindow: 1,
+            outerWindow: 1,
+            item: "<li class='page-item'><a class='page-link page' href='javascript:function Z(){Z=\"\"}Z()'></a></li>",
+        }],
+      };
+
+      /*table = id of the div */
+      var customList = new List('records', options);
+    </script>
 {% endblock %}

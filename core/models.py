@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
 
+User.__str__ = lambda user_instance: "{}{}".format(user_instance.last_name, user_instance.first_name)
+
+
 # Category of industry defined by taiwan government
 class Category(models.Model):
     sn = models.CharField(max_length=2)

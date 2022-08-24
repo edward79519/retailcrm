@@ -21,8 +21,8 @@ class AddCustomForm(forms.ModelForm):
             'author': '',
         }
         help_texts = {
-            'fullname': '輸入公司完整名稱。ex. 寶晶能源股份有限公司',
-            'shortname': '輸入公司簡稱，方便辨識。',
+            # 'fullname': '輸入公司完整名稱。ex. 寶晶能源股份有限公司',
+            # 'shortname': '輸入公司簡稱，方便辨識。',
             'sponsor': '選擇我方負責人員。',
         }
         error_messages = {
@@ -31,30 +31,28 @@ class AddCustomForm(forms.ModelForm):
         widgets = {
             'fullname': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'FullName',
+                'placeholder': 'ex. 寶晶能源股份有限公司',
                 'required': True,
             }),
             'shortname': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'ShortName',
+                'placeholder': 'ex. 寶晶能源',
                 'required': True,
             }),
             'sn': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'ID',
+                'placeholder': '00000000',
                 'required': True,
             }),
             'stock_id': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Stock_ID',
+                'placeholder': '00000',
             }),
             'source': forms.Select(attrs={
                 'class': 'form-control',
-                'placeholder': 'Source',
             }),
             'sponsor': forms.Select(attrs={
                 'class': 'form-control',
-                'placeholder': 'Sponsor',
                 'required': True,
             }),
             'author': forms.HiddenInput(),

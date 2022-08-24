@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
 from core.forms import UpdateCustomForm, UpdatePWRInfoForm
 from core.models import Company
@@ -46,6 +46,7 @@ def record_detail(request, record_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def record_add(request):
     template = loader.get_template('salescall/record_add.html')
     if request.method == 'POST':
@@ -89,6 +90,7 @@ def record_add(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def record_lock(request, record_id):
     record = CallRecord.objects.get(id=record_id)
     if record.author.id == request.user.id:
@@ -97,6 +99,7 @@ def record_lock(request, record_id):
     return HttpResponseRedirect('../')
 
 
+@login_required
 def record_delete(request, record_id):
     record = CallRecord.objects.get(id=record_id)
     if record.author.id == request.user.id:
@@ -105,6 +108,7 @@ def record_delete(request, record_id):
     return HttpResponseRedirect('/salescall/')
 
 
+@login_required
 def record_update(request, record_id):
     template = loader.get_template('salescall/record_update.html')
     record = CallRecord.objects.get(id=record_id)
@@ -141,7 +145,7 @@ def record_update(request, record_id):
 
 def comment_index(request):
     template = loader.get_template("salescall/comment_list.html")
-    records = CallRecord.objects.all()
+    records = CallRecord.objects.filter(company__is_open=True, is_open=True, is_draft=False)
     if request.method == "POST":
         if 'cmt_add' in request.POST:
             comment = Comment(record_id=request.POST["record"],
@@ -161,6 +165,7 @@ def comment_index(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def firstcall(request, comp_id):
     template = loader.get_template('salescall/firstcall.html')
     company = Company.objects.get(id=comp_id)

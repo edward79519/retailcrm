@@ -1,6 +1,10 @@
 {% extends 'base/base.html' %}
 {% load core_extra %}
 {% block title %}編輯資料 - {{ company.shortname }}{% endblock %}
+{% block custom_script %}
+    <link href="/static/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/static/select2/css/select2-bootstrap4.min.css" rel="stylesheet" />
+{% endblock %}
 {% block content %}
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
@@ -61,7 +65,17 @@
                         {{ field.label_tag }}
                         {% if forloop.counter == 16 %}
                         <div class="">
-                            原始檔案：{% if company.report %}<a href="{{ company.report.url }}">{{ company.report.file|filename }}</a>{% endif %}, 如更新請點擊下方框框重新上傳檔案。
+                            <p class="my-0">
+                            原始檔案：
+                            {% if company.report %}
+                                <a href="{{ company.report.url }}">{{ company.report.file|filename }}</a>
+                            {% else %}
+                                無
+                            {% endif %},
+                            </p>
+                            <p class="my-0">
+                                如更新請點擊下方框框重新上傳檔案。
+                            </p>
                         </div>
                         {% endif %}
                         {% if forloop.counter == 17 %}
@@ -114,4 +128,14 @@
 
         </div>
     </div>
+{% endblock %}
+{% block  js_script %}
+    <script src="/static/select2/js/select2.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('select.form-control').select2({
+                theme: 'bootstrap4',
+            });
+        });
+    </script>
 {% endblock %}

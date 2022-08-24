@@ -3,6 +3,10 @@
 {% block title %}
     批次匯入客戶
 {% endblock %}
+{% block custom_script %}
+    <link href="/static/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/static/select2/css/select2-bootstrap4.min.css" rel="stylesheet" />
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row my-3">
@@ -107,4 +111,14 @@
         </div>
         {% endif %}
     </div>
+{% endblock %}
+{% block  js_script %}
+    <script src="/static/select2/js/select2.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('select.form-control').select2({
+                theme: 'bootstrap4',
+            });
+        });
+    </script>
 {% endblock %}

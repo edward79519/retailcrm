@@ -1,6 +1,10 @@
 {% extends 'base/base.html' %}
+{% load core_extra %}
 {% block title %}
     拜訪問題一覽
+{% endblock %}
+{% block custom_script %}
+    <link href="/static/custom/css/page.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
     <div class="container">
@@ -14,38 +18,43 @@
                 </nav>
             </div>
         </div>
-        <div class="row my-3">
+        <div class="row my-3" id="comments">
             <div class="col-12">
                 <h1 class="my-3 col">拜訪問題一覽</h1>
             </div>
-            <div class="col-12">
+            <div class="col-8">
                 <div class="input-group my-3">
                     <span class="input-group-text">快速搜尋</span>
-                    <input type="text" class="form-control" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
+                    <input type="text" class="form-control search" placeholder="輸入關鍵字..." aria-label="Search" aria-describedby="search-addon">
                 </div>
+            </div>
+            <div class="col-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0"></ul>
+                </nav>
             </div>
             <div class="col-12">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>日期</th>
-                            <th>客戶名稱</th>
-                            <th>重要問題</th>
-                            <th>同仁回應</th>
-                            <th>動作</th>
+                            <th scope="col" class="text-center sort" data-sort="date">日期</th>
+                            <th scope="col" class="sort" data-sort="shortname">客戶名稱</th>
+                            <th scope="col">重要問題</th>
+                            <th scope="col">同仁回應</th>
+                            <th scope="col" class="text-center">動作</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="list">
                     {% for record in records %}
                         <tr>
-                            <td><a href="{% url 'Callrecord_Detail' record.id %}">{{ record.calldate|date:'Y-m-d'}}</a></td>
-                            <td>{{ record.company.shortname }}</td>
-                            <td>{{ record.questions }}</td>
-                            <td>
+                            <td class="text-center"><a href="{% url 'Callrecord_Detail' record.id %}" class="date">{{ record.calldate|date:'Y-m-d'}}</a></td>
+                            <td><a href="{% url 'Custom_Detail' record.company.id %}" class="shortname">{{ record.company.shortname }}</td>
+                            <td class="question">{{ record.questions }}</td>
+                            <td class="cmt">
                                 <ul>
                                     {% for comment in record.comments.all %}
-                                        <li>
-                                            <strong>{{ comment.author.username }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small>{{ comment.content }}
+                                        <li class="list-unstyled">
+                                            <strong>{{ comment.author|id_fullname }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small>{{ comment.content }}
                                             {% if comment.author.id == request.user.id %}
                                             [<button type="button"
                                                 class="btn btn-link btn-sm p-0"
@@ -64,7 +73,7 @@
                                     {% endfor %}
                                 </ul>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 {% if request.user.is_authenticated %}
                                 <button type="button"
                                         class="btn btn-primary btn-sm"
@@ -194,5 +203,21 @@
                 }
             })
         })
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <script>
+        var options = {
+            valueNames: ['date', 'shortname', 'question', 'cmt'],
+            page: 20,
+            pagination: [{
+                name: "pagination",
+                paginationClass: "pagination",
+                innerWindow: 1,
+                outerWindow: 1,
+                item: "<li class='page-item'><a class='page-link page' href='javascript:function Z(){Z=\"\"}Z()'></a></li>",
+            }],
+        };
+        /*table = id of the div */
+        var draftList = new List('comments', options);
     </script>
 {% endblock %}
