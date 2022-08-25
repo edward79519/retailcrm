@@ -80,9 +80,41 @@ WSGI_APPLICATION = 'retailCRM.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'mssql',
+        'NAME': 'RetailCRM_UAT',
+        'USER': 'ina-it',
+        'PASSWORD': 'Pa$$w0rd_inaenergy',
+        'HOST': '192.168.168.121',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 18 for SQL Server',
+            "extra_params": "TrustServerCertificate=yes",
+        },
+    },
+    'SAT': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    'INA_UAT': {
+        'ENGINE': 'mssql',
+        'NAME': 'RetailCRM_UAT',
+        'USER': 'ina-it',
+        'PASSWORD': 'Pa$$w0rd_inaenergy',
+        'HOST': '192.168.168.121',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 18 for SQL Server',
+            "extra_params": "TrustServerCertificate=yes",
+        },
+    },
+    'INA_Prod': {
+        'ENGINE': 'mssql',
+        'NAME': 'RetailCRM',
+        'USER': 'ina-inner',
+        'PASSWORD': '50791838@INAenergy',
+        'HOST': '192.168.168.121',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 18 for SQL Server',
+        },
+    },
 }
 
 
