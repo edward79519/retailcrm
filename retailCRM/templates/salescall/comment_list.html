@@ -86,6 +86,10 @@
                                 {% endif %}
                             </td>
                         </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">目前尚無資料。 </td>
+                        </tr>
                     {% endfor %}
                     </tbody>
                 </table>
