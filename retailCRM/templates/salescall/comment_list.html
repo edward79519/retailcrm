@@ -37,8 +37,8 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-center sort" data-sort="date">日期</th>
-                            <th scope="col" class="sort" data-sort="shortname">客戶名稱</th>
+                            <th scope="col" class="text-center sort text-nowrap" data-sort="date">日期</th>
+                            <th scope="col" class="sort text-nowrap" data-sort="shortname">客戶名稱</th>
                             <th scope="col">重要問題</th>
                             <th scope="col">同仁回應</th>
                             <th scope="col" class="text-center">動作</th>
@@ -47,24 +47,24 @@
                     <tbody class="list">
                     {% for record in records %}
                         <tr>
-                            <td class="text-center"><a href="{% url 'Callrecord_Detail' record.id %}" class="date">{{ record.calldate|date:'Y-m-d'}}</a></td>
-                            <td><a href="{% url 'Custom_Detail' record.company.id %}" class="shortname">{{ record.company.shortname }}</td>
-                            <td class="question">{{ record.questions }}</td>
+                            <td class="text-center text-nowrap"><a href="{% url 'Callrecord_Detail' record.id %}" class="date">{{ record.calldate|date:'Y-m-d'}}</a></td>
+                            <td class="text-nowrap"><a href="{% url 'Custom_Detail' record.company.id %}" class="shortname">{{ record.company.shortname }}</a></td>
+                            <td class="question" style="max-width:40vw">{{ record.questions|linebreaksbr }}</td>
                             <td class="cmt">
-                                <ul>
+                                <ul class="px-0">
                                     {% for comment in record.comments.all %}
-                                        <li class="list-unstyled">
-                                            <strong>{{ comment.author|id_fullname }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }}):</small>{{ comment.content }}
+                                        <li class="list-unstyled align-self-baseline">
+                                            <span class="text-nowrap"><strong>{{ comment.author|id_fullname }}</strong><small class="text-muted">({{ comment.add_time|date:'m/d h:i' }})</small>:</span> {{ comment.content }}
                                             {% if comment.author.id == request.user.id %}
                                             [<button type="button"
-                                                class="btn btn-link btn-sm p-0"
+                                                class="btn btn-link btn-sm p-0 align-baseline"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#updateModal"
                                                 data-bs-cmt="{{ comment.id }}"
                                                 data-bs-cnt="{{ comment.content }}">編輯
                                             </button>/<button
                                                 type="button"
-                                                class="btn btn-link btn-sm p-0 text-danger"
+                                                class="btn btn-link btn-sm p-0 text-danger  align-baseline  "
                                                 id="cmt_del"
                                                 data-id="{{ comment.id }}">刪除</button>]
                                             {% endif %}
@@ -76,7 +76,7 @@
                             <td class="text-center">
                                 {% if request.user.is_authenticated %}
                                 <button type="button"
-                                        class="btn btn-primary btn-sm"
+                                        class="btn btn-primary btn-sm text-nowrap"
                                         data-bs-toggle="modal"
                                         data-bs-target="#exampleModal"
                                         data-bs-record="{{ record.id }}"

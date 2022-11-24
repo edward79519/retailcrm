@@ -145,7 +145,7 @@ def record_update(request, record_id):
 
 def comment_index(request):
     template = loader.get_template("salescall/comment_list.html")
-    records = CallRecord.objects.filter(company__is_open=True, is_open=True, is_draft=False)
+    records = CallRecord.objects.filter(company__is_open=True, is_open=True, is_draft=False).order_by("-calldate")
     if request.method == "POST":
         if 'cmt_add' in request.POST:
             comment = Comment(record_id=request.POST["record"],
