@@ -22,7 +22,7 @@
         </div>
         <div class="row">
             <div class="col-sm-6">
-                <small>負責人：{{ company.sponsor|id_fullname }}, 客戶狀態：{{ company.status|default_if_none:'無' }}, 上次拜訪時間：{{ company.callrecords.last.calldate|datedelta }}</small>
+                <small>負責人：{{ company.sponsor|id_fullname }}, 開發階段：{{ company.status|default_if_none:'無' }}, 上次拜訪時間：{{ company.callrecords.last.calldate|datedelta }}</small>
             </div>
             <div class="col-sm-6 text-end">
                 <small class="">更新時間：{{ company.update_time|date:"Y-m-d H:i" }}, 新增時間：{{ company.add_time|date:"Y-m-d H:i" }}</small>
@@ -141,7 +141,7 @@
                 備註：
             </div>
             <div class="col-10">
-                <strong>{{ company.remark|default_if_none:'' }}</strong>
+                <strong>{{ company.remark|default_if_none:''|linebreaksbr }}</strong>
             </div>
         </div>
         <div class="row mt-3 ">

@@ -121,11 +121,11 @@
         <div class="row my-3 gy-3">
             <div class="col-12">
                 <h4>需求詳述：</h4>
-                <p class="p-3">{{ record.requirement }}</p>
+                <p class="p-3">{{ record.requirement|linebreaksbr }}</p>
             </div>
             <div class="col-12">
                 <h4>重要問題：</h4>
-                <p class="p-3">{{ record.questions }}</p>
+                <p class="p-3">{{ record.questions|linebreaksbr }}</p>
             </div>
             <div class="col-12" id="cmt_div">
                 <h4>同仁回應：</h4>

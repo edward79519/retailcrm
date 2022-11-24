@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import formset_factory
 
-from .models import Company
+from .models import Company, Status
 from .validator import FileValidator
 from django.utils.translation import gettext_lazy as _
 
@@ -72,7 +72,7 @@ class UpdateCustomForm(forms.ModelForm):
             'sponsor': '負責人',
             'category': '產業別',
             'rank': '客戶等級',
-            'status': '客戶狀態',
+            'status': '開發階段',
             'addr_county': '公司地址',
             'addr_detail': '公司地址',
             'website': '公司網站',
@@ -173,6 +173,10 @@ class UpdateCustomForm(forms.ModelForm):
 
     field_order = ['fullname', 'shortname', 'sn', 'stock_id']
 
+    def __init__(self, *args, **kwargs):
+        super(UpdateCustomForm, self).__init__(*args, **kwargs)
+        self.fields['status'].queryset = self.fields['status'].queryset.order_by('order')
+
 
 class UpdatePWRInfoForm(forms.ModelForm):
     class Meta:
@@ -216,6 +220,10 @@ class UpdatePWRInfoForm(forms.ModelForm):
                 'class': 'form-control',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdatePWRInfoForm, self).__init__(*args, **kwargs)
+        self.fields['status'].queryset = self.fields['status'].queryset.order_by('order')
 
 
 class XlsUploadForm(forms.Form):
